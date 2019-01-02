@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+
+<html lang='en'>
+<head>
+    <meta charset='utf-8' />
+    <title>Async/Await</title>
+    <link rel='stylesheet' type='text/css' href='styles/style.css'>
+</head>
+
+<body>
+
+    <script src='../url-images/scripts/imgs-url.js'></script>
+    <script src='scripts/async-await.js'></script>
+   
+    Hint: view the developer tools console to see the output.
+    <h1>Async/Await<h1>
+
+    <div class = 'container' id='images' />
+
+<script>
+
+
+    // Selected a element to append the loaded images
+    elem = document.getElementById('images');
+    ci = new CImagesSources();
+
+    for (let url of ci.remotes(1)){
+        appendImageAsync(elem, url);    
+    }
+
+    for (let url of ci.local){
+        appendImageAsync(elem, url);    
+    }
+
+</script>
+</body>
+
+</html>

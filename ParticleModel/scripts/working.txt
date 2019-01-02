@@ -1,0 +1,195 @@
+class Particle {
+    i:number;
+    id: number;
+    x: number;
+    y: number;
+    neigh: {j : number, dist:number}[];
+
+    constructor(id: number, x: number, y: number){
+        this.i = id;
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.neigh = [];
+    }
+}
+
+class Model {
+    particles : Particle[];
+    radius : number;
+    modelSize : number;
+    currParticle : number;
+
+    constructor(modelSize : number, radius : number){
+        this.modelSize = modelSize;
+        this.radius = radius;
+        this.loadParticles();
+    } 
+    
+    loadParticles() {
+        this.particles = [];
+        for (var i:number = 0; i < this.modelSize; i++){
+            this.particles.push(new Particle(i, Math.random(), Math.random()));
+        }
+    }
+
+    private findNeigh(p : Particle, index : number) {
+        return Math.abs(p.x-p0.x) <= this.radius;
+    }
+
+    private neighDist = (p : Particle) => { return {j : p.i, dist : EuclidianDist(p.x-this.particles[this.currParticle].x, p.y-this.particles[this.currParticle].y)} };
+
+    public sort() {
+
+        this.particles = this.particles.sort( (p1: Particle, p2: Particle): number => {
+                if (p1.x < p2.x) return -1;
+                if (p1.x > p2.x) return 1;
+                return 0;
+            }) 
+
+        this.particles.forEach((p : Particle, index : number) => { p.i = index;});    
+    }
+
+    public calcNeigh(i : number){
+        this.currParticle = i;
+        this.particles[i].neigh = this.particles.filter(findNeigh).map(neighDist);
+    }
+    
+    public log() {
+        console.log('-- Particles  -----------------------------------------------------------------------'); 
+        console.log(...this.particles);
+        console.log('-- Neighbors  -----------------------------------------------------------------------'); 
+        console.log(...this.particles[this.currParticle].neigh);
+    }
+}
+function findNeigh(p : Particle, index : number) {
+    return Math.abs(p.x-p0.x) <= dist;
+}
+
+var EuclidianDist = (a : number, b : number) => Math.sqrt(a*a+b*b);
+
+var neighDist = (p : Particle) => { return {j : p.i, dist : EuclidianDist(p.x-p0.x, p.y-p0.y)} };
+
+const dist : number = 0.17;
+const indPoint : number = 10;
+const modelSize : number = 20;
+
+var model: Array<Particle> = [];
+var sortedModel : Array<Particle>;
+
+
+for (var i:number = 0; i < modelSize; i++){
+    model.push(new Particle(i, Math.random(), Math.random()));
+} 
+
+sortedModel = model.sort(
+    (p1: Particle, p2: Particle): number => {
+        if (p1.x < p2.x) return -1;
+        if (p1.x > p2.x) return 1;
+        return 0;
+    }
+)
+
+sortedModel.forEach((p : Particle, index : number) => { p.i = index;});
+// console.log('----------------------------------------------------------------------------------------------'); 
+// console.log(...sortedModel);
+
+const p0 : Particle = sortedModel[indPoint];
+
+// console.log('----------------------------------------------------------------------------------------------'); 
+// console.log(p0, dist);
+
+p0.neigh = sortedModel.filter(findNeigh).map(neighDist);
+
+console.log(...p0.neigh);
+console.log('----------------------------------------------------------------------------------------------'); 
+console.log('----------------------------------------------------------------------------------------------'); 
+
+var newModel : Model = new Model(modelSize, dist);
+newModel.sort();
+newModel.calcNeigh(indPoint);
+newModel.log();
+
+
+-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
+
+// Promise approach
+
+function getJSON(){
+
+    // To make the function blocking we manually create a Promise.
+    return new Promise( function(resolve) {
+        axios.get('https://tutorialzine.com/misc/files/example.json')
+            .then( function(json) {
+
+                // The data from the request is available in a .then block
+                // We return the result using resolve.
+                resolve(json);
+            });
+    });
+
+}
+
+// Async/Await approach
+
+
+// Async/Await requirements: Latest Chrome/FF browser or Babel: https://babeljs.io/docs/plugins/transform-async-to-generator/
+// Fetch requirements: Latest Chrome/FF browser or Github fetch polyfill: https://github.com/github/fetch
+
+// async function
+async function fetchAsync () {
+  // await response of fetch call
+  let response = await fetch('https://api.github.com');
+  // only proceed once promise is resolved
+  let data = await response.json();
+  // only proceed once second promise is resolved
+  return data;
+}
+
+// trigger async function
+// log response or catch error of fetch promise
+fetchAsync()
+    .then(data => console.log(data))
+    .catch(reason => console.log(reason.message))
+-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
+[object Object] {
+  authorizations_url: "https://api.github.com/authorizations",
+  code_search_url: "https://api.github.com/search/code?q={query}{&page,per_page,sort,order}",
+  commit_search_url: "https://api.github.com/search/commits?q={query}{&page,per_page,sort,order}",
+  current_user_authorizations_html_url: "https://github.com/settings/connections/applications{/client_id}",
+  current_user_repositories_url: "https://api.github.com/user/repos{?type,page,per_page,sort}",
+  current_user_url: "https://api.github.com/user",
+  emails_url: "https://api.github.com/user/emails",
+  emojis_url: "https://api.github.com/emojis",
+  events_url: "https://api.github.com/events",
+  feeds_url: "https://api.github.com/feeds",
+  followers_url: "https://api.github.com/user/followers",
+  following_url: "https://api.github.com/user/following{/target}",
+  gists_url: "https://api.github.com/gists{/gist_id}",
+  hub_url: "https://api.github.com/hub",
+  issue_search_url: "https://api.github.com/search/issues?q={query}{&page,per_page,sort,order}",
+  issues_url: "https://api.github.com/issues",
+  keys_url: "https://api.github.com/user/keys",
+  notifications_url: "https://api.github.com/notifications",
+  organization_repositories_url: "https://api.github.com/orgs/{org}/repos{?type,page,per_page,sort}",
+  organization_url: "https://api.github.com/orgs/{org}",
+  public_gists_url: "https://api.github.com/gists/public",
+  rate_limit_url: "https://api.github.com/rate_limit",
+  repository_search_url: "https://api.github.com/search/repositories?q={query}{&page,per_page,sort,order}",
+  repository_url: "https://api.github.com/repos/{owner}/{repo}",
+  starred_gists_url: "https://api.github.com/gists/starred",
+  starred_url: "https://api.github.com/user/starred{/owner}{/repo}",
+  team_url: "https://api.github.com/teams",
+  user_organizations_url: "https://api.github.com/user/orgs",
+  user_repositories_url: "https://api.github.com/users/{user}/repos{?type,page,per_page,sort}",
+  user_search_url: "https://api.github.com/search/users?q={query}{&page,per_page,sort,order}",
+  user_url: "https://api.github.com/users/{user}"
+}
+
+-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
