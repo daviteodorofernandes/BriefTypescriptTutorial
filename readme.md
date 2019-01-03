@@ -1,4 +1,4 @@
-# BriefTypescriptTutorial
+# TypeScript Examples
 
 ## Running the Application
 

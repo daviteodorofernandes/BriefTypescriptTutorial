@@ -11,27 +11,33 @@
 </head>
 
 <body>
-    <h2>TypeScript Particle Model</h2><br><br>
-
-    <canvas id="modelCanvas" style="border:1px solid #4508ee;">
+    <h2>Particle Model</h2>
+    <canvas id="modelCanvas" style="border:1px solid #4508ee; width: 40%; height:40%; background-color: aliceblue;">
             Your browser does not support the canvas element.
     </canvas>
+    
+    <h2>Matrix of the Coefficients </h2>
+    <canvas id="matrixCanvas" style="border:1px solid #4508ee; width: 40%; height:300px; background-color:aliceblue;">
+            Your browser does not support the canvas element.
+    </canvas>
+
     <script>
         modelCanvas = document.querySelector('#modelCanvas');
-        modelCanvas.width = window.innerWidth / 2;
-        modelCanvas.height = window.innerHeight / 2;
     
         modelSize = 1000;
         radius = 1.0/Math.sqrt(modelSize);
-        indCurr = 230;
+        neighSample = 230;
     
         model = new Model(modelSize, radius);
     
         model.sort();
-        model.calcNeigh(indCurr);
-    
+        model.calcNeigh();
+        
         model.plotParticles(modelCanvas);
-        model.plotNeigh(modelCanvas, indCurr);
+        model.plotNeigh(modelCanvas, neighSample);
+
+        matrixCanvas = document.querySelector('#matrixCanvas');
+        model.plotMatrix(matrixCanvas);
     </script>
 </body>
 </html>

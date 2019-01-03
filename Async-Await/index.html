@@ -5,21 +5,45 @@
     <meta charset='utf-8' />
     <title>Async/Await</title>
     <link rel='stylesheet' type='text/css' href='styles/style.css'>
+
+    <link rel="stylesheet" href="../highlight-pack/styles/github.css">
+    <script src="../highlight-pack/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
 </head>
 
 <body>
-
     <script src='../url-images/scripts/imgs-url.js'></script>
     <script src='scripts/async-await.js'></script>
    
     Hint: view the developer tools console to see the output.
     <h1>Async/Await<h1>
-
     <div class = 'container' id='images' />
+      
+<div><pre><code class="ts" style="font-size: small">
+function handlesErrorAsync(error : string){
+    console.log(error);
+    }
+async function appendImageAsync(elem: HTMLElement, url: string) {
+    try {
+        // This async call may fail.
+        let result = await loadImageAsync(url, elem);
+    }
+    catch(error) {
+        // If it does we will catch the error here.
+        handlesErrorAsync(error);
+    }  
+}
+function loadImageAsync(url: string, elem: HTMLElement) {
+    var image = new Image();
+
+    image.onload = function() { elem.appendChild(image); };
+    image.onerror = function() { handlesErrorAsync('Could not load image at ' + url); };
+    image.src = url;
+}
+</code></pre></div>
 
 <script>
-
-
     // Selected a element to append the loaded images
     elem = document.getElementById('images');
     ci = new CImagesSources();
@@ -31,7 +55,6 @@
     for (let url of ci.local){
         appendImageAsync(elem, url);    
     }
-
 </script>
 </body>
 

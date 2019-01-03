@@ -53,3 +53,10 @@ div {
 	/* color:white; */
     /* font-size:18px;  */
 }
+
+.isDisabled {
+	color: currentColor;
+	cursor: not-allowed;
+	opacity: 0.5;
+	text-decoration: none;
+  }

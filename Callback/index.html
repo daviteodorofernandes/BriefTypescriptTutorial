@@ -5,6 +5,9 @@
     <meta charset='utf-8' />
     <title>Callback</title>
     <link rel='stylesheet' type='text/css' href='styles/style.css'>
+    <link rel="stylesheet" href="../highlight-pack/styles/github.css">
+    <script src="../highlight-pack/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
 </head>
 
 <body>
@@ -18,8 +21,28 @@
 
     <div class = 'container' id='images' />
 
-<script>
+<div><pre><code class="ts" style="font-size: small">
+function handlesCallbackError(err : string){
+    console.log(err);
+    throw new Error(err);
+}
+type TCallback = (url:any, image? : Node, elem?: HTMLElement) => any;
+function loadImageCallback(url:string, elem: HTMLElement, callback: TCallback) {
+    var image = new Image();
+    image.onload = function() { callback(null, image, elem); };
+    image.onerror = function() { callback(new Error('Could not load image at ' + url));};
+    image.src = url;
+}
+let callbackF: TCallback = function(error: any, image: Node, elem: HTMLElement) {
+    if (error){ handlesCallbackError(error); } 
+    elem.appendChild(image);
+}
+function appendImageCallback(elem: HTMLElement, url : string){
+    loadImageCallback(url, elem, callbackF);
+}
+</code></pre></div>
 
+<script>
     // Selected a element to append the loaded images
     elem = document.getElementById('images');
     ci = new CImagesSources();
@@ -31,7 +54,6 @@
     for (let url of ci.local){
         appendImageCallback(elem, url);    
     }
-
 </script>
 </body>
 

@@ -12,12 +12,14 @@ class Point2D {
 class Particle extends Point2D {
         i:number;
         id: number;
+        aii :number;
         neigh: {j : number, dist:number, aij : number}[];
     
         constructor(id: number, x: number, y: number){
             super(x, y);
             this.i = id;
             this.id = id;
+            this.aii = 0;
             this.neigh = [];
         }
     }
@@ -39,8 +41,6 @@ class Model {
         this.loadParticles();
     } 
     
-    public weight = (r : number) : number => { return (r < this.radius ? (this.radius / r - 1) :  0.0); }
-	
     private loadParticles() {
         this.particles = [];
         this.ny = Math.floor(Math.sqrt(this.modelSize));
@@ -58,65 +58,75 @@ class Model {
 
     public sort() {
 
-        this.particles = this.particles.sort( (p1: Particle, p2: Particle): number => {
-                if (p1.x < p2.x) return -1;
-                if (p1.x > p2.x) return 1;
-                return 0;
-            }) 
+        this.particles = this.particles.sort( (p1: Particle, p2: Particle): number => 
+            { return (p1.x < p2.x? -1: p1.x > p2.x? 1 : 0); }); 
 
         this.particles.forEach((p : Particle, index : number) => { p.i = index;});    
     }
 
-    public calcNeigh(i : number){
+    public calcNeigh(){
 
-        // this.currParticle = this.particles[i];
         const re = this.radius;
-
         const filterNeigh = (q : Particle) => { return (p.i < q.i && Math.abs(p.x-q.x) <= re); }
         const mapNeigh = (q : Particle)  => { return {j : q.i, dist : norm(p, q), aij : 0.0}; }
-        
-        const p : Particle = this.particles[i];
-        this.particles[i].neigh = this.particles.filter(filterNeigh, p).map(mapNeigh);
-        this.particles[i].neigh = this.particles[i].neigh.filter(neigh => neigh.dist < re)
-        
-        this.particles[i].neigh.forEach( n => n.aij = this.weight(n.dist));
+        var p : Particle;
+        for (var i = 0; i < this.modelSize; i++){
+            p  = this.particles[i]; 
+            this.particles[i].neigh = this.particles.filter(filterNeigh, p).map(mapNeigh);
+            this.particles[i].neigh = this.particles[i].neigh.filter(neigh => neigh.dist < re)
+            this.particles[i].neigh.forEach( n => n.aij = weight(n.dist, this.radius));
+
+            const neigh = this.particles[i].neigh;
+            this.particles[i].aii = neigh.reduce((acc, neigh) => acc + neigh.aij, 0);
+        }
     }
 
     public plotNeigh(canvas : any, i : number){
+        const largerBorder = Math.max(this.nx, this.ny);
         const p : Particle = this.particles[i];
         const jNeigh = p.neigh.map(neigh => { return neigh.j })
         const points: Point2D[] = jNeigh.map(j => {var {i, id, neigh, ...point2D} = this.particles[j]; return point2D; });
-        plot(canvas, points, 4, "#FF0000" ); // Red
-        
-        plot(canvas, [{x:p.x, y:p.y}], 6, "#000000" ); // black
-        
+
+        plot(canvas, points, largerBorder, "#FF0000" ); // Red
+        plot(canvas, [{x:p.x, y:p.y}], largerBorder, "#FFFFFF" ); // black
     }
 
     public plotParticles(canvas : any){
-
+        const largerBorder = Math.max(this.nx, this.ny);
         var points = this.particles.map(value => {var {i, id, neigh, ...point2D} = value; return point2D; })
-        plot(canvas, points, 4, "#4508ee");  // Blue
+        plot(canvas, points, largerBorder, "#4508ee");  // Blue
     }
-    
+
+    public plotMatrix(canvas : any){
+        const largerBorder = this.modelSize;
+        var p : Particle;
+        var points: Point2D[];
+
+        for (var i = 0; i < this.modelSize; i++){
+            p  = this.particles[i]; 
+            const jNeigh = p.neigh.map(neigh => { return neigh.j })
+            points = [];
+            points.push(new Point2D(i/largerBorder,i/largerBorder))
+            jNeigh.forEach(j => points.push(new Point2D(i/largerBorder,j/ largerBorder),new Point2D(i/largerBorder,j/largerBorder)));
+            console.log(...points)
+            plot(canvas, points, largerBorder, "#000000" ); // back
+        }
+    }
     
     public log() {
-        console.log('-- Particles  -----------------------------------------------------------------------'); 
-        console.log(...this.particles);
-        console.log('-- Neighbors  -----------------------------------------------------------------------'); 
-        console.log(...this.currParticle.neigh);
+        console.log('-- Particles = ', ...this.particles);
+        console.log('-- Neighbors = ',...this.currParticle.neigh);
     }
-
 }
 
-function plot(canvas : any, points: Point2D[], particleSize : number, color : string){
+function plot(canvas : any, points: Point2D[], largerBorder : number, color : string){
         
     var height : number = canvas.height * 0.9;
     var width : number = canvas.width * 0.99;
-    // var particleSize : number = width / this.nx / 2;
+    var particleSize : number = Math.min(canvas.width, canvas.height) / largerBorder / 2;
 
     canvas = canvas.getContext('2d');
     canvas.fillStyle = color; 
-
 
     for (var i:number = 0; i < points.length; i++){
         var x : number = (points[i].x+0.02)*width;
@@ -127,14 +137,10 @@ function plot(canvas : any, points: Point2D[], particleSize : number, color : st
     }
 }
 
+const weight = (r : number, radius : number) : number => { return (r < radius ? (radius / r - 1) :  0.0); }
 
-var norm2 = (a : number, b : number) => Math.sqrt(a*a+b*b);
+const norm = (a : any, b : any) => 
+                { return ((a instanceof  Point2D && b instanceof  Point2D)?
+                            Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y)): 
+                            Math.sqrt(a*a+b*b));}
 
-const norm = function (a : any, b : any) {
-    if (a instanceof  Point2D && b instanceof  Point2D){
-        return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y));
-    }
-    else {
-        return Math.sqrt(a*a+b*b);
-    }
-} 

@@ -5,18 +5,41 @@
     <meta charset='utf-8' />
     <title>Promises</title>
     <link rel='stylesheet' type='text/css' href='styles/style.css'>
+    <link rel="stylesheet" href="../highlight-pack/styles/github.css">
+    <script src="../highlight-pack/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>    
 </head>
 
 <body>
 
     <script src='../url-images/scripts/imgs-url.js'></script>
     <script src='scripts/promises.js'></script>
-    
 
     Hint: view the developer tools console to see the output.
     <h1>Load images with asyncronily Promises<h1>
-
     <div class = 'container' id='images' />
+
+<div><pre><code class="ts" style="font-size: small">
+function loadImagePromises(url : string) {
+    return new Promise((resolve, reject) => {
+        let img = new Image();
+        img.addEventListener('load', e => resolve(img));
+        img.addEventListener('error', () => {
+        reject(new Error("Failed to load image's URL: ${url}"));
+        });
+        img.src = url;
+    });
+    }
+
+function handlesErrorPromises(error : string){
+    console.error(error);
+}
+function appendImagePromises(elem:HTMLElement, url : string)
+{
+    loadImagePromises(url).then((img : Node) => elem.appendChild(img))
+    .catch(error => handlesErrorPromises(error));  
+}
+</code></pre></div>
 
 <script>
 
